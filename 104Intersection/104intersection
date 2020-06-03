@@ -1,0 +1,193 @@
+#!/usr/bin/env python3
+##
+## EPITECH PROJECT, 2018
+## 104intersection
+## File description:
+## Martinage | Hure
+##
+
+import sys
+import math
+
+def print_help():
+    print("USAGE")
+    print("    ./104intersection opt xp yp zp xv yv zv p")
+    print()
+    print("DESCRIPTION")
+    print("    opt            surfaces option: 1 for a sphere, 2 for a cylinder, 3 for a cone")
+    print("    (xp, yp, zp)   coordinates of a point by which the light rat passes through")
+    print("    (xv, yv, zv)   coordinates of a vector parallel to the light ray")
+    print("    p              parameter: radius of the sphere, radius of the cylinder, or")
+    print("                   angle formed by the cone and the Z-axis")
+
+def help_me():
+    if len(sys.argv) == 2:
+        if sys.argv[1] == "-h":
+            print_help()
+        else:
+            exit(84)
+
+def error(a, b, c, d, e, f, g, h):
+    try:
+        a = int(sys.argv[1])
+        b = int(sys.argv[2])
+        c = int(sys.argv[3])
+        d = int(sys.argv[4])
+        e = int(sys.argv[5])
+        f = int(sys.argv[6])
+        g = int(sys.argv[7])
+        h = int(sys.argv[8])
+    except:
+        print("Arg Error:")
+        print("\tOne or multiple arg are not numbers")
+        exit(84)
+    if len(sys.argv) != 9 and len(sys.argv) != 2:
+        print("Arg Error:")
+        print("\tThe number of given arg is wrong")
+        exit(84)
+    elif int(sys.argv[1]) < 1 or int(sys.argv[1]) > 3:
+        print("Form Error:")
+        print("\tThe form arg is wrong")
+        exit(84)
+    elif int(sys.argv[8]) < 1:
+        print("Dimension Error:")
+        print("\tThe given dimension is too small")
+        exit(84)
+    elif int(sys.argv[8]) > 89 and int(sys.argv[1]) == 3:
+        print("Dimesion Error:")
+        print("\tThe given dimesion is too big for a cone")
+        exit(84)
+    elif int(sys.argv[2]) == 0 and int(sys.argv[3]) == 0 and int(sys.argv[4]) == 0:
+        print("Line Error:")
+        print("\tThe line dimesion can't be equal to 0")
+        exit(84)
+
+def print_form(form, dimension):
+    if form  == 1:
+        print("Sphere of radius %d" % (dimension))
+    elif form == 2:
+        print("Cylinder of radius %d" % (dimension))
+    elif form == 3:
+        print("Cone with a %d degree angle" % (dimension))
+
+def print_line(line, vector):
+    print("Line passing through the point ", end='')
+    print(line, end='')
+    print(" and parallel to the vector ", end='')
+    print(vector)
+
+def print_point(point):
+    if len(point) == 0:
+        print("No intersection point.")
+    elif len(point) == 1:
+        print("1 intersection point:")
+        print("(%.3f, %.3f, %.3f)" % (point[0][0], point[0][1], point[0][2]))
+    elif len(point) == 2:
+        print("2 intersection points:")
+        print("(%.3f, %.3f, %.3f)" % (point[0][0], point[0][1], point[0][2]))
+        print("(%.3f, %.3f, %.3f)" % (point[1][0], point[1][1], point[1][2]))
+    elif len(point) > 2:
+        print("There is an infinite number of intersection points.")
+
+def sphere(dimension, line, vector):
+    a = (vector[0] * vector[0]) + (vector[1] * vector[1]) + (vector[2] * vector[2])
+    b = (2 * line[0] * vector[0]) + (2 * line[1] * vector[1]) + (2 * line[2] * vector[2])
+    c = (line[0] * line[0]) + (line[1] * line[1]) + (line[2] * line[2]) - (dimension * dimension)
+    delta = float(b * b - 4 * a * c)
+    res = 0
+    sol = []
+    if delta == 0:
+        res = -(b / (2 * a))
+        med = (line[0] + res * vector[0], line[1] + res * vector[1], line[2] + res * vector[2])
+        sol.append(med)
+    elif delta < 0:
+        return sol
+    elif delta > 0:
+        res = ((-b) - float(math.sqrt(delta))) / (2 * a)
+        med = (line[0] + res * vector[0], line[1] + res * vector[1], line[2] + res * vector[2])
+        sol.append(med)
+        res = ((-b) + float(math.sqrt(delta))) / (2 * a)
+        med = (line[0] + res * vector[0], line[1] + res * vector[1], line[2] + res * vector[2])
+        sol.append(med)
+    return sol
+
+def cylinder(dimension, line, vector):
+    a = (vector[0] * vector[0]) + (vector[1] * vector[1])
+    b = (2 * line[0] * vector[0]) + (2 * line[1] * vector[1])
+    c = (line[0] * line[0]) + (line[1] * line[1]) - (dimension * dimension)
+    delta = float(b * b - 4 * a * c)
+    h = math.sqrt((line[0] * line[0] + line[1] * line[1]))
+    res = 0
+    sol = []
+    if vector[0] == 0 and vector[1] == 0 and vector[2] != 0 and h == dimension:
+        sol.append("Infinite")
+        sol.append("number")
+        sol.append("point")
+    elif vector[0] == 0 and vector[1] == 0 and vector[2] != 0 and h < dimension:
+        return sol
+    elif delta < 0:
+        return sol
+    elif delta == 0:
+        if a == 0:
+            return sol
+        res = -(b / (2 * a))
+        med = (line[0] + res * vector[0], line[1] + res * vector[1], line[2] + res * vector[2])
+        sol.append(med)
+    elif delta > 0:
+        res = ((-b) + float(math.sqrt(delta))) / (2 * a)
+        med = (line[0] + res * vector[0], line[1] + res * vector[1], line[2] + res * vector[2])
+        sol.append(med)
+        res = ((-b) - float(math.sqrt(delta))) / (2 * a)
+        med = (line[0] + res * vector[0], line[1] + res * vector[1], line[2] + res * vector[2])
+        sol.append(med)
+    return sol
+
+def cone(dimension, line, vector):
+    t = (math.pi * dimension) / 180
+    ang = math.acos(vector[2] / math.sqrt(vector[0] * vector[0] + vector[1] * vector[1] + vector[2] * vector[2]))
+    ang = 180 * ang / math.pi
+    a = (vector[0] * vector[0]) + (vector[1] * vector[1]) - ((vector[2] * vector[2]) * (math.tan(t) * math.tan(t)))
+    b = (2 * line[0] * vector[0]) + (2 * line[1] * vector[1]) - ((2 * line[2] * vector[2]) * (math.tan(t) * math.tan(t)))
+    c = (line[0] * line[0]) + (line[1] * line[1]) - ((line[2] * line[2]) * (math.tan(t) * math.tan(t)))
+    delta = float(b * b - 4 * a * c)
+    sol = []
+    if ang == dimension or 3 * ang == dimension:
+        sol.append("Infinite")
+        sol.append("number")
+        sol.append("point")
+    elif dimension >= 90 or delta < 0:
+        return sol
+    elif delta == 0:
+        res = -(b / (2 * a))
+        med = (line[0] + res * vector[0], line[1] + res * vector[1], line[2] + res * vector[2])
+        sol.append(med)
+    else:
+        res = ((-b) - float(math.sqrt(delta))) / (2 * a)
+        med = (line[0] + res * vector[0], line[1] + res * vector[1], line[2] + res * vector[2])
+        sol.append(med)
+        res = ((-b) + float(math.sqrt(delta))) / (2 * a)
+        med = (line[0] + res * vector[0], line[1] + res * vector[1], line[2] + res * vector[2])
+        sol.append(med)
+    return sol
+
+
+def main():
+    help_me()
+    error(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6], sys.argv[7], sys.argv[8])
+    form = int(sys.argv[1])
+    dimension = int(sys.argv[8])
+    line = (int(sys.argv[2]), int(sys.argv[3]), int(sys.argv[4]))
+    vector = (int(sys.argv[5]), int(sys.argv[6]), int(sys.argv[7]))
+    point = []
+    if form == 1:
+        point = sphere(dimension, line, vector)
+    elif form == 2:
+        point = cylinder(dimension, line, vector)
+    elif form == 3:
+        point = cone(dimension, line, vector)
+    print_form(form, dimension)
+    print_line(line, vector)
+    print_point(point)
+    return 0
+
+main()
