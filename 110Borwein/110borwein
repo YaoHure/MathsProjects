@@ -1,0 +1,89 @@
+#!/usr/bin/env python3
+##
+## EPITECH PROJECT, 2019
+## 110borwein
+## File description:
+## martinage hure
+##
+
+import sys
+import math
+
+def print_help():
+    print("USAGE")
+    print("\t./110borwein n")
+    print()
+    print()
+    print("DESCRIPTION")
+    print("\tn\tconstant defining the integral to be computed")
+
+def error(n):
+    try:
+        n = int(n)
+    except:
+        print("Value Error")
+        print("\tn arg must be an integer")
+        exit(84)
+    if n < 0:
+        print("Value Error")
+        print("\tn must be positive")
+        exit(84)
+
+def diff(x):
+    if abs(x) < 1e-10:
+        return 0
+    return x
+
+def borwein(x, n):
+    if x == 0:
+        return 1
+    k = 0
+    res = 1
+    while k <= n:
+        res *= (2*k + 1) * math.sin(x / (2*k + 1)) / x
+        k += 1
+    return res
+
+def absolute(n):
+    if n < 0:
+        n *= -1
+    return n
+
+def integrate(n, func):
+    i = 0
+    k = 0
+    while k < 10000:
+        x = k * 0.5
+        i += func(x, n)
+        k += 1
+    print('I%d = %.10f' % (n, i))
+    print('diff = %.10f' % absolute(diff(i - math.pi / 2)))
+
+def midpoint(n):
+    print('Midpoint:')
+    integrate(n, lambda x, n: borwein(x, n) * 0.5)
+    integrate(n, lambda x, n: borwein(x, n))
+
+def trapezoid(n):
+    print('\nTrapezoidal:')
+    integrate(n, lambda x, n: (borwein(x, n) + borwein(x + 0.5, n)) * 0.25)
+
+def simpson(n):
+    print('\nSimpson:')
+    integrate(n, lambda x, n: (borwein(x, n) + 4 * borwein(x + 0.25, n) + borwein(x + 0.5, n)) / 12)
+
+def main():
+    if len(sys.argv) != 2:
+        print("Arg Error")
+        print("\tfunction must have at least one parameter")
+        exit(84)
+    n = sys.argv[1]
+    error(n)
+    n = int(n)
+    midpoint(n)
+    trapezoid(n)
+    simpson(n)
+    return (0)
+
+
+main()
