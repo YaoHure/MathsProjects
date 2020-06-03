@@ -1,0 +1,37 @@
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+
+import sys
+import math
+
+def main() :
+    if sys.argv.__len__() != 8:
+        print("./101pong x0 y0 z0 x1 y1 z1")
+        sys.exit(84)
+
+    try:
+        x0, y0, z0 = float(sys.argv[1]), float(sys.argv[2]), float(sys.argv[3])
+        x1, y1, z1 = float(sys.argv[4]), float(sys.argv[5]), float(sys.argv[6])
+        n = int(sys.argv[7])
+    except ValueError:
+        print("./101pong x0 y0 z0 x1 y1 z1")
+        sys.exit(84)
+
+    if n < 0:
+        print("./101pong x0 y0 z0 x1 y1 z1 n")
+        sys.exit(84)
+    if n > 0:
+        print ("The velocity vector of the ball is:")
+        print ("(%.2f, %.2f, %.2f)" %((x1 - x0), (y1 -y0), (z1 - z0)))
+        print ("At time t + %d, ball coordinates will be:" %n)
+        print ("(%.2f, %.2f, %.2f)" %((x0 + (x1 - x0) * (n + 1)), (y0 + (y1 - y0) * (n + 1)), (z0 + (z1 - z0) * (n + 1))))
+        if (x1 - x0 == 0 and y1 - y0 == 0 and z1 - z0 == 0):
+            angle = 0;
+        else:
+            angle = 90-(math.acos(abs(z1-z0)/math.sqrt(pow(x1-x0, 2)+pow(y1-y0, 2)+pow(z1-z0, 2))))*180/math.pi
+    if any([z1 / z0 < 0, angle <= 0, angle > 90]):
+        print("The ball won't reach the bat.")
+    else:
+        print ("The incidence angle is:")
+        print ("%.2f degrees" % (angle))
+main()
