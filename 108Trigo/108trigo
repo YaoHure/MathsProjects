@@ -1,0 +1,194 @@
+#!/usr/bin/env python3
+##
+## EPITECH PROJECT, 2019
+## salut
+## File description:
+## salut
+##
+
+import sys
+import math
+
+def print_help():
+    print("USAGE")
+    print("\t    ./108trigo fun a0 a1 a2 ...\n")
+    print("DESCRIPTION")
+    print('\t   fun\tfunction to be applied, among, at least "EXP", "COS", "SIN", "COSH"')
+    print('\t   \tand "SINH"')
+    print("\t   ai\tcoeficients of the matrix")
+
+def error(fun, a):
+    try:
+        fun = str(fun)
+        for i in range(len(a)):
+            a[i] = int(a[i])
+    except:
+        print("Arg Error:")
+        print("\tOne or multiple arg are wrong")
+        exit(84)
+    check = ["EXP", "COS", "SIN", "COSH", "SINH"]
+    if fun not in check:
+        print("Func Error")
+        print("\tChoosen fucntion doesn't exist")
+        exit(84)
+    if (len(a) != int(math.sqrt(len(a))) ** 2):
+        print("Arg Error")
+        print("\tWrong number of coefficients")
+        exit(84)
+        
+def product_matrix(a, b):
+    tmp = []
+    new = []
+    if len(a) != len(b[0]) or len(a[0]) != len(b):
+        exit(84)
+    for y in range(len(a)):
+        for x in range(len(b)):
+            med = 0
+            for i in range(len(a)):
+                med += a[y][i] * b[i][x]
+            tmp.append(med)
+    a = []
+    for j in range(int(math.sqrt(len(tmp)))):
+        liste = []
+        for k in range(int(math.sqrt(len(tmp)))):
+            liste.append(tmp[j * int(math.sqrt(len(tmp))) + k])
+        a.append(liste)
+    return (a)
+
+def pow_matrix(a, nb):
+    tmp = a[:]
+    for i in range(nb - 1):
+        tmp = product_matrix(tmp, a)
+    return (tmp)
+
+def add_matrix(a, b):
+    ret = []
+    for i in range(len(a)):
+        tmp = []
+        for j in range(len(a[0])):
+            tmp.append(a[i][j] + b[i][j])
+        ret.append(tmp)
+    return (ret)
+
+def sub_matrix(a, b):
+    ret = []
+    for i in range(len(a)):
+        tmp = []
+        for j in range(len(a[0])):
+            tmp.append(a[i][j] - b[i][j])
+        ret.append(tmp)
+    return (ret)
+
+def div_matrix(a, div):
+    ret = []
+    for i in range(len(a)):
+        tmp = []
+        for j in range(len(a[0])):
+            tmp.append(a[i][j] / div)
+        ret.append(tmp)
+    return (ret)
+
+def mul_matrix(a, mul):
+    ret = []
+    for i in range(len(a)):
+        tmp = []
+        for j in range(len(a[0])):
+            tmp.append(a[i][j] * mul)
+        ret.append(tmp)
+    return (ret)
+
+def matrix(a):
+    new = []
+    count = 0
+    for i in range(int(math.sqrt(len(a)))):
+        med = []
+        for j in range(int(math.sqrt(len(a)))):
+            med.append(a[count])
+            count += 1
+        new.append(med)
+    return (new)
+
+def init_matrix(a):
+    ret = []
+    for i in range(len(a)):
+        tmp = []
+        for j in range(len(a[0])):
+            if (i == j):
+                tmp.append(1)
+            else:
+                tmp.append(0)
+        ret.append(tmp)
+    return (ret)
+
+def factorielle(nb):
+    a = 1
+    while nb != 0:
+        a *= nb
+        nb -= 1
+    return (a)
+
+def exp(a):
+    ret = init_matrix(a)
+    for nb in range(1,50):
+        tmp = div_matrix(pow_matrix(a, nb), factorielle(nb))
+        ret = add_matrix(tmp, ret)
+    return (ret)
+
+def sincos(a, fun):
+    sin = 1 if fun == "SIN" else 0
+    ret = init_matrix(a)
+    if fun == "SIN":
+        ret = a[:]
+    for nb in range(1,80):
+        med = ((-1) ** nb) / factorielle(2 * nb + sin)
+        tmp = mul_matrix(pow_matrix(a, 2 * nb + sin), med)
+        ret = add_matrix(ret, tmp)
+    return (ret)
+
+def hyperbolic(a, fun):
+    tmp1 = exp(a)
+    tmp2 = exp(mul_matrix(a, -1))
+    if fun == "SINH":
+        ret = sub_matrix(tmp1, tmp2)
+    elif fun == "COSH":
+        ret = add_matrix(tmp1, tmp2)
+    ret = div_matrix(ret, 2)
+    return (ret)
+
+def main():
+    if len(sys.argv) == 2:
+        if sys.argv[1] == "-h":
+            print_help()
+            exit(0)
+        else:
+            print("Arg Error")
+            print("\tNot enough arg")
+            exit(84)
+    elif len(sys.argv) < 3:
+        print("Arg Error")
+        print("\tNot enough arg")
+        exit(84)
+    fun = sys.argv[1]
+    a = []
+    for i in range(2, len(sys.argv)):
+        a.append(sys.argv[i])
+    if error(fun, a) == 84:
+        return (84)
+    a = matrix(a)
+    pow_matrix(a, 3)
+    if fun == "SIN" or fun == "COS":
+        a = sincos(a, fun)
+    elif fun == "SINH" or fun == "COSH":
+        a = hyperbolic(a, fun)
+    else:
+        a = exp(a)
+    for x in range(len(a)):
+        for y in range(len(a)):
+            if y == len(a) - 1:
+                print("%.2f" % (a[x][y]),end='')
+            else:
+                print("%.2f\t" % (a[x][y]),end='')
+        print()
+    return (0)
+
+main()
